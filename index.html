@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Офелия, доверься мне</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif;}
+
+body{
+  height:100vh;
+  background:linear-gradient(135deg,#ff9a9e,#fad0c4,#a1c4fd);
+  background-size:400% 400%;
+  animation:bg 12s ease infinite;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+
+@keyframes bg{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+
+h1{color:#6a1b9a;font-size:28px;}
+p{margin:10px;color:#333;}
+
+.btn{
+  padding:12px 20px;
+  background:#ff4081;
+  color:#fff;
+  border-radius:25px;
+  margin:8px;
+  cursor:pointer;
+  transition:0.2s;
+}
+.btn:hover{transform:scale(1.1);}
+
+#progress{color:#ff4081;font-weight:bold;margin-bottom:10px;}
+
+.emoji{position:absolute;font-size:30px;cursor:pointer;}
+
+.hidden{display:none;}
+
+.heart{
+  position:absolute;
+  color:red;
+  font-size:20px;
+  animation:floatUp 2s linear forwards;
+}
+@keyframes floatUp{
+  from{transform:translateY(0);opacity:1;}
+  to{transform:translateY(-150px);opacity:0;}
+}
+
+.secret{
+  position:absolute;
+  bottom:10px;
+  right:10px;
+  opacity:0.08;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Офелия, доверься мне</h1>
+<p id="stage">Уровень 1 / 4</p>
+<p>Поймай 20 смайликов</p>
+<div id="progress">0 / 20</div>
+<div class="btn" onclick="startGame()">Начать 🎮</div>
+
+<div class="secret" onclick="secret()">...</div>
+
+<audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3"></audio>
+
+<script>
+let count=0;
+let running=false;
+let choice="";
+
+function sound(){
+  document.getElementById("clickSound").play();
+}
+
+function vibrate(){
+  if(navigator.vibrate) navigator.vibrate(50);
+}
+
+function rand(min,max){return Math.random()*(max-min)+min;}
+
+function createEmoji(){
+  const e=document.createElement('div');
+  e.className='emoji';
+  e.innerText=['✨','🌸','🍀','🦄'][Math.floor(Math.random()*4)];
+  e.style.left=rand(0,window.innerWidth-30)+'px';
+  e.style.top=rand(0,window.innerHeight-30)+'px';
+  document.body.appendChild(e);
+
+  e.onclick=()=>{
+    e.remove();
+    count++;
+    sound();
+    vibrate();
+    document.getElementById('progress').innerText=count+" / 20";
+
+    if(count>=20){
+      level2();
+    }
+  };
+
+  setTimeout(()=>{if(e.parentNode)e.remove();},3000);
+}
+
+function startGame(){
+  if(running) return;
+  running=true;
+
+  setInterval(()=>{
+    if(count<20) createEmoji();
+  },400);
+}
+
+function level2(){
+  document.body.innerHTML=`
+  <h1>Уровень 2 / 4</h1>
+  <p>Выбери 😏</p>
+  <div class="btn" onclick="level3('leave')">Закрыть сайт 😅</div>
+  <div class="btn" onclick="level3('secret')">Узнать секрет 🤫</div>`;
+}
+
+function level3(c){
+  choice=c;
+  document.body.innerHTML=`
+  <h1>Уровень 3 / 4</h1>
+  <p>Ты больше любишь?</p>
+  <div class="btn" onclick="final('night')">🌙 ночь</div>
+  <div class="btn" onclick="final('day')">☀️ день</div>`;
+}
+
+function final(time){
+  document.body.innerHTML=`<h1>Финал 🎉</h1><div id="finalText"></div>
+  <div class="btn" onclick="openTG()">Написать мне 💬</div>`;
+
+  const text=document.getElementById('finalText');
+
+  if(choice==="secret" && time==="night"){
+    text.innerHTML="Ты интересная... давай узнаем друг друга ближе 😌";
+  }else{
+    text.innerHTML="Ты дошла до конца — это уже говорит о тебе многое 😉";
+  }
+
+  hearts();
+}
+
+function hearts(){
+  setInterval(()=>{
+    const h=document.createElement('div');
+    h.className='heart';
+    h.innerText='❤️';
+    h.style.left=Math.random()*window.innerWidth+'px';
+    h.style.top=window.innerHeight+'px';
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),2000);
+  },300);
+}
+
+function openTG(){
+  window.location.href="https://t.me/@Amelikovh11";
+}
+
+function secret(){
+  alert("😏 Ты нашла секрет. Это +100 к внимательности");
+}
+</script>
+
+</body>
+</html>
